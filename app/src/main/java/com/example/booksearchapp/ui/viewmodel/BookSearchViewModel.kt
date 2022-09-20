@@ -5,6 +5,10 @@ import com.example.booksearchapp.data.model.Book
 import com.example.booksearchapp.data.model.SearchResponse
 import com.example.booksearchapp.data.repository.BookSearchRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
 //Repository로 부터 데이터를 받아와서 처리, 따라서 Factory 필요
@@ -35,7 +39,10 @@ class BookSearchViewModel(
     fun deleteBook(book: Book) = viewModelScope.launch(Dispatchers.IO) {
         bookSearchRepository.deleteBooks(book)
     }
-    val favoriteBooks: LiveData<List<Book>> = bookSearchRepository.getFavoriteBooks()
+
+    // viewModelScope, WhileSubscribed(5000), listOf() 책의 초기값
+    val favoriteBooks: StateFlow<List<Book>> = bookSearchRepository.getFavoriteBooks()
+        .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf())
 
     // SavedState
     var query = String()

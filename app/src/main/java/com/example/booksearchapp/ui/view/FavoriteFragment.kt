@@ -6,6 +6,9 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.repeatOnLifecycle
 import androidx.navigation.Navigation
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
@@ -16,7 +19,10 @@ import com.example.booksearchapp.R
 import com.example.booksearchapp.databinding.FragmentFavoriteBinding
 import com.example.booksearchapp.ui.adapter.BookSearchAdapter
 import com.example.booksearchapp.ui.viewmodel.BookSearchViewModel
+import com.example.booksearchapp.util.collectLatestStateFlow
 import com.google.android.material.snackbar.Snackbar
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 
 class FavoriteFragment : Fragment() {
 
@@ -49,7 +55,29 @@ class FavoriteFragment : Fragment() {
         setupTouchHelper(view)
 
         //observing을 통해 자동으로 view 갱신
-        bookSearchViewModel.favoriteBooks.observe(viewLifecycleOwner) {
+//        bookSearchViewModel.favoriteBooks.observe(viewLifecycleOwner) {
+//            bookSearchAdapter.submitList(it)
+//        }
+
+        //observer를 사용하는 LiveData와 다르게 Flow는 코루틴 안에서 collectLatest를 써서 데이터 구독
+        //favoriteBooks를 stateFlow로 변환해서 favoriteFragment 생명주기와 동기화
+//        lifecycleScope.launch {
+//            bookSearchViewModel.favoriteBooks.collectLatest {
+//                bookSearchAdapter.submitList(it)
+//            }
+//        }
+
+        //StateFlow의 구독이 되면서 favoriteFragment 생명주기와 동기화
+//        viewLifecycleOwner.lifecycleScope.launch {
+//            viewLifecycleOwner.repeatOnLifecycle(Lifecycle.State.STARTED) {
+//                bookSearchViewModel.favoriteBooks.collectLatest {
+//                    bookSearchAdapter.submitList(it)
+//                }
+//            }
+//        }
+
+        //확장 함수로 처리
+        collectLatestStateFlow(bookSearchViewModel.favoriteBooks) {
             bookSearchAdapter.submitList(it)
         }
     }
