@@ -5,11 +5,9 @@ import com.example.booksearchapp.data.model.Book
 import com.example.booksearchapp.data.model.SearchResponse
 import com.example.booksearchapp.data.repository.BookSearchRepository
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 //Repository로 부터 데이터를 받아와서 처리, 따라서 Factory 필요
 //ViewModel은 그 자체로는 생성시 초기 값을 전달 받을 수 없음
@@ -23,7 +21,7 @@ class BookSearchViewModel(
 
     fun searchBooks(query: String) = viewModelScope.launch(Dispatchers.IO) {
         //bookSearchRepository.searchBooks를 실행하되 파라미터는 query 이외에 모두 고정 값 사용
-        val response = bookSearchRepository.searchBooks(query, "accuracy", 1, 15)
+        val response = bookSearchRepository.searchBooks(query, getSortMode(), 1, 15)
         if (response.isSuccessful) {
             response.body()?.let { body ->
                 //Retrofit 서비스의 반환값은 MutableLiveData에 저장
@@ -60,5 +58,18 @@ class BookSearchViewModel(
     //저장 및 로드에 사용할 SAVE_STATE_KEY정의
     companion object {
         private const val SAVE_STATE_KEY = "query"
+    }
+
+    // DataStore
+    //값을 저장
+    fun saveSortMode(value: String) = viewModelScope.launch(Dispatchers.IO) {
+        bookSearchRepository.saveSortMode(value)
+    }
+    
+    //값을 불러옴
+    suspend fun getSortMode() = withContext(Dispatchers.IO) {
+        //설정 값 특성상 전체 데이터 스트림을 가져올 필요 없음
+        //withContext는 반드시 값을 반환하고 종료됨
+        bookSearchRepository.getSortMode().first()
     }
 }

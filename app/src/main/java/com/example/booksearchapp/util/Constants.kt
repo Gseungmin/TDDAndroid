@@ -6,4 +6,5 @@ object Constants {
     const val BASE_URL = "https://dapi.kakao.com/"
     const val API_KEY = "937eecb78ab4f0780521a9f149517547"
     const val SEARCH_BOOKS_TIME_DELAY = 100L
+    const val DATASTORE_NAME = "preferences_datastore"
 }
