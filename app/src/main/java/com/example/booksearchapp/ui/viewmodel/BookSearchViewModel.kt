@@ -3,18 +3,22 @@ package com.example.booksearchapp.ui.viewmodel
 import androidx.lifecycle.*
 import androidx.paging.PagingData
 import androidx.paging.cachedIn
+import androidx.work.*
 import com.example.booksearchapp.data.model.Book
 import com.example.booksearchapp.data.model.SearchResponse
 import com.example.booksearchapp.data.repository.BookSearchRepository
+import com.example.booksearchapp.worker.CacheDeleteWorker
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import java.util.concurrent.TimeUnit
 
 //Repository로 부터 데이터를 받아와서 처리, 따라서 Factory 필요
 //ViewModel은 그 자체로는 생성시 초기 값을 전달 받을 수 없음
 class BookSearchViewModel(
     private val bookSearchRepository: BookSearchRepository,
+    private val workManager: WorkManager,
     private val savedStateHandle: SavedStateHandle
 ) : ViewModel() {
 
@@ -60,6 +64,7 @@ class BookSearchViewModel(
     //저장 및 로드에 사용할 SAVE_STATE_KEY정의
     companion object {
         private const val SAVE_STATE_KEY = "query"
+        private val WORKER_KEY = "cache_worker"
     }
 
     // DataStore
@@ -97,5 +102,39 @@ class BookSearchViewModel(
         }
     }
 
+    // WorkManager
+    fun saveCacheDeleteMode(value: Boolean) = viewModelScope.launch(Dispatchers.IO) {
+        bookSearchRepository.saveCacheDeleteMode(value)
+    }
 
+    suspend fun getCacheDeleteMode() = withContext(Dispatchers.IO) {
+        bookSearchRepository.getCacheDeleteMode().first()
+    }
+
+    fun setWork() {
+        //제약 상황 설정, 충전중이고 베터리 잔량이 낮지 않은 경우에만 작업 수행
+        val constraints = Constraints.Builder()
+            .setRequiresCharging(true)
+            .setRequiresBatteryNotLow(true)
+            .build()
+
+        //workRequest를 만들면서 constraints를 설정
+        //15분에 한번마다 수행
+        val workRequest = PeriodicWorkRequestBuilder<CacheDeleteWorker>(15, TimeUnit.MINUTES)
+            .setConstraints(constraints)
+            .build()
+
+        //이름을 붙여 작업 큐에 전달
+        //동일한 작업을 중복하지 않도록 enqueueUniquePeriodicWork사용 및 REPLACE
+        workManager.enqueueUniquePeriodicWork(
+            WORKER_KEY, ExistingPeriodicWorkPolicy.REPLACE, workRequest
+        )
+    }
+
+    //WORKER_KEY라는 이름을 가진 작업 삭제
+    fun deleteWork() = workManager.cancelUniqueWork(WORKER_KEY)
+
+    //내부의 작업 중 WORKER_KEY라는 이름을 가진 작업의 현재 상태를 LiveData 형태로 반환
+    fun getWorkStatus(): LiveData<MutableList<WorkInfo>> =
+        workManager.getWorkInfosForUniqueWorkLiveData(WORKER_KEY)
 }

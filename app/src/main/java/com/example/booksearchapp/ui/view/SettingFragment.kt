@@ -1,6 +1,7 @@
 package com.example.booksearchapp.ui.view
 
 import android.os.Bundle
+import android.util.Log
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -41,6 +42,7 @@ class SettingFragment : Fragment() {
 
         saveSettings()
         loadSettings()
+        showWorkStatus()
     }
 
     private fun saveSettings() {
@@ -53,6 +55,17 @@ class SettingFragment : Fragment() {
             }
             bookSearchViewModel.saveSortMode(value)
         }
+
+        // WorkManager
+        // btn이 눌렸는지에 따라 work 작업 다르게 작동
+        binding.swCacheDelete.setOnCheckedChangeListener { _, isChecked ->
+            bookSearchViewModel.saveCacheDeleteMode(isChecked)
+            if (isChecked) {
+                bookSearchViewModel.setWork()
+            } else {
+                bookSearchViewModel.deleteWork()
+            }
+        }
     }
 
     private fun loadSettings() {
@@ -64,6 +77,27 @@ class SettingFragment : Fragment() {
                 else -> return@launch
             }
             binding.rgSort.check(buttonId)
+        }
+
+        // WorkManager
+        //cache 버튼의 활성 여부를 반영
+        lifecycleScope.launch {
+            val mode = bookSearchViewModel.getCacheDeleteMode()
+            binding.swCacheDelete.isChecked = mode
+        }
+    }
+
+    //라이브 데이터를 반환받은 작업상태 표시
+    private fun showWorkStatus() {
+        bookSearchViewModel.getWorkStatus().observe(viewLifecycleOwner) { workInfo ->
+            Log.d("WorkManager", workInfo.toString())
+            //초기에는 값이 존재하지 않으므로 처리 로직
+            if (workInfo.isEmpty()) {
+                binding.tvWorkStatus.text = "No works"
+            } else {
+                //workInfo의 현재 상태 가져오는 법
+                binding.tvWorkStatus.text = workInfo[0].state.toString()
+            }
         }
     }
 

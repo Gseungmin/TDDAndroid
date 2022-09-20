@@ -1,10 +1,7 @@
 package com.example.booksearchapp.data.repository
 
 import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
-import androidx.datastore.preferences.core.edit
-import androidx.datastore.preferences.core.emptyPreferences
-import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.datastore.preferences.core.*
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
@@ -55,6 +52,7 @@ class BookSearchRepositoryImpl(
     // 단순히 string을 사용하던 sharedPreference와 다르게 타입 안정을 위해 및 저장할 데이터가 String이기 때문에 stringPreferencesKey 사용
     private object PreferencesKeys {
         val SORT_MODE = stringPreferencesKey("sort_mode")
+        val CACHE_DELETE_MODE = booleanPreferencesKey("cache_delete_mode")
     }
 
     //저장 작업은 코루틴 안에서 이루어져야 하므로 suspend 사용 및 전달받을 Mode 값을 edit 블록 안에서 저장
@@ -108,5 +106,27 @@ class BookSearchRepositoryImpl(
             ),
             pagingSourceFactory = pagingSourceFactory
         ).flow
+    }
+
+    //workManger
+    override suspend fun saveCacheDeleteMode(mode: Boolean) {
+        dataStore.edit { prefs ->
+            prefs[PreferencesKeys.CACHE_DELETE_MODE] = mode
+        }
+    }
+
+    override suspend fun getCacheDeleteMode(): Flow<Boolean> {
+        return dataStore.data
+            .catch { exception ->
+                if (exception is IOException) {
+                    exception.printStackTrace()
+                    emit(emptyPreferences())
+                } else {
+                    throw exception
+                }
+            }
+            .map { prefs ->
+                prefs[PreferencesKeys.CACHE_DELETE_MODE] ?: false
+            }
     }
 }

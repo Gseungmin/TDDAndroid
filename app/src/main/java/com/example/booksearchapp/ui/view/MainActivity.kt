@@ -15,6 +15,7 @@ import androidx.navigation.ui.AppBarConfiguration
 import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
+import androidx.work.WorkManager
 import com.example.booksearchapp.R
 import com.example.booksearchapp.data.db.BookSearchDatabase
 import com.example.booksearchapp.data.repository.BookSearchRepositoryImpl
@@ -32,6 +33,8 @@ class MainActivity : AppCompatActivity() {
 
     //dataStore의 싱글톤 객체 생성
     private val Context.dataStore by preferencesDataStore(DATASTORE_NAME)
+
+    private val workManager = WorkManager.getInstance(application)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -51,7 +54,7 @@ class MainActivity : AppCompatActivity() {
 
         val database = BookSearchDatabase.getInstance(this)
         val bookSearchRepository = BookSearchRepositoryImpl(database, dataStore)
-        val factory = BookSearchViewModelProviderFactory(bookSearchRepository, this)
+        val factory = BookSearchViewModelProviderFactory(bookSearchRepository, workManager, this)
         //viewModel 초기화
         viewModel = ViewModelProvider(this, factory).get(BookSearchViewModel::class.java)
     }
