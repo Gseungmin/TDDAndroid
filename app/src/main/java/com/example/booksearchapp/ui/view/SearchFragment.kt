@@ -6,15 +6,20 @@ import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.core.view.isVisible
 import androidx.core.widget.addTextChangedListener
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.paging.LoadState
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.booksearchapp.databinding.FragmentSearchBinding
 import com.example.booksearchapp.ui.adapter.BookSearchAdapter
+import com.example.booksearchapp.ui.adapter.BookSearchLoadStateAdapter
+import com.example.booksearchapp.ui.adapter.BookSearchPagingAdapter
 import com.example.booksearchapp.ui.viewmodel.BookSearchViewModel
 import com.example.booksearchapp.util.Constants.SEARCH_BOOKS_TIME_DELAY
+import com.example.booksearchapp.util.collectLatestStateFlow
 
 class SearchFragment : Fragment() {
 
@@ -22,7 +27,8 @@ class SearchFragment : Fragment() {
     private val binding get() = _binding!!
 
     private lateinit var bookSearchViewModel: BookSearchViewModel
-    private lateinit var bookSearchAdapter: BookSearchAdapter
+//    private lateinit var bookSearchAdapter: BookSearchAdapter
+    private lateinit var bookSearchAdapter: BookSearchPagingAdapter
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,15 +54,21 @@ class SearchFragment : Fragment() {
         setupRecyclerView()
         searchBooks()
 
-        bookSearchViewModel.searchResult.observe(viewLifecycleOwner) { response ->
-            val books = response.documents
-            bookSearchAdapter.submitList(books)
+//        bookSearchViewModel.searchResult.observe(viewLifecycleOwner) { response ->
+//            val books = response.documents
+//            bookSearchAdapter.submitList(books)
+//        }
+
+        collectLatestStateFlow(bookSearchViewModel.searchPagingResult) {
+            bookSearchAdapter.submitData(it)
         }
     }
 
     //RecyclerView 설정
     private fun setupRecyclerView() {
-        bookSearchAdapter = BookSearchAdapter()
+//        bookSearchAdapter = BookSearchAdapter()
+
+        bookSearchAdapter = BookSearchPagingAdapter()
         binding.rvSearchResult.apply {
             setHasFixedSize(true)
             layoutManager =
@@ -67,9 +79,14 @@ class SearchFragment : Fragment() {
                     DividerItemDecoration.VERTICAL
                 )
             )
-            adapter = bookSearchAdapter
+//            adapter = bookSearchAdapter
+            //헤더와 푸터 둘다 설정 가능
+            //페이징 데이터 어댑터에 로드 스테이트 어댑터를 연결하면 데이터의 로딩 상태를 리사이클러뷰의 내부의 헤더나 푸터로 표시할 수 있음
+            adapter = bookSearchAdapter.withLoadStateFooter(
+                footer = BookSearchLoadStateAdapter(bookSearchAdapter::retry)
+            )
         }
-        bookSearchAdapter.setOnItemClick {
+        bookSearchAdapter.setOnItemClickListener {
             val action = SearchFragmentDirections.actionFragmentSearchToBookFragment(it)
             findNavController().navigate(action)
         }
@@ -92,12 +109,33 @@ class SearchFragment : Fragment() {
                 text?.let {
                     val query = it.toString().trim()
                     if (query.isNotEmpty()) {
-                        bookSearchViewModel.searchBooks(query)
+//                        bookSearchViewModel.searchBooks(query)
+                        bookSearchViewModel.searchBooksPaging(query)
                         bookSearchViewModel.query = query
                     }
                 }
             }
             startTime = endTime
+        }
+    }
+
+    private fun setupLoadState() {
+        //addLoadStateListener를 달고 LoadStates 값을 받아옴
+        //combinedLoadStates는 페이징 소스와 remoteImmediate 소스의 로딩 상태를 가지고 있음
+        //여기서는 remoteImmediate는 다루지 않기 때문에 source에만 대응
+        //loadState는 로딩 시작에 만들어지는 pretend, 종료시 만들어지는 append, 로딩 값을 갱신할때 만들어지는 refresh를 속성을고 가짐
+        bookSearchAdapter.addLoadStateListener { combinedLoadStates ->
+            val loadState = combinedLoadStates.source
+            //item이 1개 미만이고 LoadState.NotLoading이면서 loadState.append.endOfPaginationReached이면 리스트가 비어있는지 판정
+            val isListEmpty = bookSearchAdapter.itemCount < 1
+                    && loadState.refresh is LoadState.NotLoading
+                    && loadState.append.endOfPaginationReached
+
+            //검색결과가 없으면 noResult 표시
+            binding.tvEmptylist.isVisible = isListEmpty
+            binding.rvSearchResult.isVisible = !isListEmpty
+            //로딩중일때는 progressBar표시
+            binding.progressBar.isVisible = loadState.refresh is LoadState.Loading
         }
     }
 

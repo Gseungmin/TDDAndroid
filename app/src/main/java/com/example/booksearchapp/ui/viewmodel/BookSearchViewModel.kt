@@ -1,6 +1,8 @@
 package com.example.booksearchapp.ui.viewmodel
 
 import androidx.lifecycle.*
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
 import com.example.booksearchapp.data.model.Book
 import com.example.booksearchapp.data.model.SearchResponse
 import com.example.booksearchapp.data.repository.BookSearchRepository
@@ -72,4 +74,28 @@ class BookSearchViewModel(
         //withContext는 반드시 값을 반환하고 종료됨
         bookSearchRepository.getSortMode().first()
     }
+
+    //Paging
+    //Repository의 getFavoritePagingBooks 응답에 cachedIn을 붙여 코루틴이 데이터 스트림을 캐시하고 공유 가능하게 만들어줌
+    //그리고 UI에서 감시해야 하는 데이터이므로 stateIn사용
+    val favoritePagingBooks: StateFlow<PagingData<Book>> =
+        bookSearchRepository.getFavoritePagingBooks()
+            .cachedIn(viewModelScope)
+            .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), PagingData.empty())
+
+    private val _searchPagingResult = MutableStateFlow<PagingData<Book>>(PagingData.empty())
+    val searchPagingResult: StateFlow<PagingData<Book>> = _searchPagingResult.asStateFlow()
+
+    //searchBooksPaging의 결과가 _searchPagingResult를 갱신하고 UI에서는 변경 불가능한 searchPagingResult로 표현
+    fun searchBooksPaging(query: String) {
+        viewModelScope.launch {
+            bookSearchRepository.searchBooksPaging(query, getSortMode())
+                .cachedIn(viewModelScope)
+                .collect {
+                    _searchPagingResult.value = it
+                }
+        }
+    }
+
+
 }

@@ -5,11 +5,15 @@ import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.emptyPreferences
 import androidx.datastore.preferences.core.stringPreferencesKey
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
 import com.example.booksearchapp.data.api.RetrofitInstance.api
 import com.example.booksearchapp.data.db.BookSearchDatabase
 import com.example.booksearchapp.data.model.Book
 import com.example.booksearchapp.data.model.SearchResponse
 import com.example.booksearchapp.data.repository.BookSearchRepositoryImpl.PreferencesKeys.SORT_MODE
+import com.example.booksearchapp.util.Constants.PAGING_SIZE
 import com.example.booksearchapp.util.Sort
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
@@ -75,5 +79,34 @@ class BookSearchRepositoryImpl(
             .map { prefs ->
                 prefs[SORT_MODE] ?: Sort.ACCURACY.value
             }
+    }
+
+    // Paging
+    override fun getFavoritePagingBooks(): Flow<PagingData<Book>> {
+        val pagingSourceFactory = { db.bookSearchDao().getFavoritePagingBooks() }
+        return Pager( //Pager를 구현하기 위해서는 PagingConfig를 통해 파라미터 전달
+            //아래 3가지 속성을 가지는데 pageSize는 어떤 기기가 대상이 되더라도 viewHolder에 표시할 데이터가 모자라지 않을 값으로 설정
+            //enablePlaceholders가 true면 데이터 전체 사이즈를 받아와서 RecyclerView에 Place Holder를 미리 만들어두고 화면에 표시되지 않은 항목 null
+            //따라서 필요한 만큼만 로딩을 위해 false 처리
+            //maxsize는 pager가 메모리에 최대로 가질수 있는 페이지 수
+            config = PagingConfig(
+                pageSize = PAGING_SIZE,
+                enablePlaceholders = false,
+                maxSize = PAGING_SIZE * 3
+            ),
+            pagingSourceFactory = pagingSourceFactory
+        ).flow //flow를 붙여 결과를 flow로 만든다
+    }
+
+    override fun searchBooksPaging(query: String, sort: String): Flow<PagingData<Book>> {
+        val pagingSourceFactory = { BookSearchPagingSource(query, sort) }
+        return Pager(
+            config = PagingConfig(
+                pageSize = PAGING_SIZE,
+                enablePlaceholders = false,
+                maxSize = PAGING_SIZE * 3
+            ),
+            pagingSourceFactory = pagingSourceFactory
+        ).flow
     }
 }
