@@ -19,6 +19,9 @@
         <action
             android:id="@+id/action_favoriteFragment_self"
             app:destination="@id/fragment_favorite" />
+        <action
+            android:id="@+id/action_fragment_favorite_to_fragment_book"
+            app:destination="@id/fragment_book" />
     </fragment>
     <fragment
         android:id="@+id/fragment_search"
@@ -34,6 +37,9 @@
         <action
             android:id="@+id/action_searchFragment_self"
             app:destination="@id/fragment_search" />
+        <action
+            android:id="@+id/action_fragment_search_to_bookFragment"
+            app:destination="@id/fragment_book" />
     </fragment>
     <fragment
         android:id="@+id/fragment_setting"
@@ -49,5 +55,14 @@
         <action
             android:id="@+id/action_settingFragment_self"
             app:destination="@id/fragment_setting" />
+    </fragment>
+    <fragment
+        android:id="@+id/fragment_book"
+        android:name="com.example.booksearchapp.ui.view.BookFragment"
+        android:label="@string/book_info"
+        tools:layout="@layout/fragment_book" >
+        <argument
+            android:name="book"
+            app:argType="com.example.booksearchapp.data.model.Book" />
     </fragment>
 </navigation>

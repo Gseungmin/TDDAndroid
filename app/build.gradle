@@ -3,6 +3,8 @@ plugins {
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
     id 'androidx.navigation.safeargs.kotlin'
+    //Serializabl보다 속도면에서 우위
+    id("kotlin-parcelize")
 }
 
 android {

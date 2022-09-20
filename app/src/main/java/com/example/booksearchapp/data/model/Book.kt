@@ -1,9 +1,12 @@
 package com.example.booksearchapp.data.model
 
 
+import android.os.Parcelable
 import com.squareup.moshi.Json
 import com.squareup.moshi.JsonClass
+import kotlinx.parcelize.Parcelize
 
+@Parcelize
 @JsonClass(generateAdapter = true)
 //데이터를 받아올 클래스
 data class Book(
@@ -31,4 +34,4 @@ data class Book(
     val translators: List<String>,
     @field:Json(name = "url")
     val url: String
-)
+) : Parcelable
