@@ -10,6 +10,8 @@ import android.webkit.WebViewClient
 import androidx.navigation.fragment.navArgs
 import com.example.booksearchapp.R
 import com.example.booksearchapp.databinding.FragmentBookBinding
+import com.example.booksearchapp.ui.viewmodel.BookSearchViewModel
+import com.google.android.material.snackbar.Snackbar
 
 class BookFragment : Fragment() {
 
@@ -18,6 +20,8 @@ class BookFragment : Fragment() {
 
     //args 초기화
     private val args by navArgs<BookFragmentArgs>()
+    //Floating Action정의
+    private lateinit var bookSearchViewModel: BookSearchViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -36,6 +40,7 @@ class BookFragment : Fragment() {
     @SuppressLint("SetJavaScriptEnabled")
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
+        bookSearchViewModel = (activity as MainActivity).viewModel
 
         val book = args.book
         //args가 전달받은 값을 webview에서 표시
@@ -43,6 +48,12 @@ class BookFragment : Fragment() {
             webViewClient = WebViewClient()
             settings.javaScriptEnabled = true
             loadUrl(book.url)
+        }
+
+        //클릭이 일어나면 전달받은 책을 DB에 저장
+        binding.fabFavorite.setOnClickListener {
+            bookSearchViewModel.saveBook(book)
+            Snackbar.make(view, "Book has saved", Snackbar.LENGTH_SHORT).show()
         }
     }
 

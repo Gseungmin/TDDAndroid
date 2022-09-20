@@ -14,6 +14,7 @@ import androidx.navigation.ui.navigateUp
 import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
 import com.example.booksearchapp.R
+import com.example.booksearchapp.data.db.BookSearchDatabase
 import com.example.booksearchapp.data.repository.BookSearchRepositoryImpl
 import com.example.booksearchapp.databinding.ActivityMainBinding
 import com.example.booksearchapp.ui.viewmodel.BookSearchViewModel
@@ -38,11 +39,12 @@ class MainActivity : AppCompatActivity() {
         //앱이 처음 실행되었을 경우에만 화면에 SearchFragment 표현
         //액티비티가 재생성 되었을 경우에는 굳이 첫번째 화면을 표시할 필요가 없기 때문
         //savedInstanceState가 앱이 처음 실행되었는지 여부 판단
-        if (savedInstanceState == null) {
-            binding.navBottom.selectedItemId = R.id.fragment_search
-        }
+//        if (savedInstanceState == null) {
+//            binding.navBottom.selectedItemId = R.id.fragment_search
+//        }
 
-        val bookSearchRepository = BookSearchRepositoryImpl()
+        val database = BookSearchDatabase.getInstance(this)
+        val bookSearchRepository = BookSearchRepositoryImpl(database)
         val factory = BookSearchViewModelProviderFactory(bookSearchRepository, this)
         //viewModel 초기화
         viewModel = ViewModelProvider(this, factory).get(BookSearchViewModel::class.java)
