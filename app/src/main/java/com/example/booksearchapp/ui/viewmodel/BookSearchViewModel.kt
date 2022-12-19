@@ -14,8 +14,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
 
-//Repository로 부터 데이터를 받아와서 처리, 따라서 Factory 필요
-//ViewModel은 그 자체로는 생성시 초기 값을 전달 받을 수 없음
+/**
+ * ViewModel 객체, Repository로 부터 데이터를 받아와서 처리, 따라서 Factory 필요
+ * */
 class BookSearchViewModel(
     private val bookSearchRepository: BookSearchRepository,
     private val workManager: WorkManager,
@@ -25,6 +26,7 @@ class BookSearchViewModel(
     private val _searchResult = MutableLiveData<SearchResponse>()
     val searchResult: LiveData<SearchResponse> get() = _searchResult
 
+    //repository의 searchBooks를 코루틴 내부에서 수행하는 함수
     fun searchBooks(query: String) = viewModelScope.launch(Dispatchers.IO) {
         //bookSearchRepository.searchBooks를 실행하되 파라미터는 query 이외에 모두 고정 값 사용
         val response = bookSearchRepository.searchBooks(query, getSortMode(), 1, 15)
@@ -43,16 +45,17 @@ class BookSearchViewModel(
     fun deleteBook(book: Book) = viewModelScope.launch(Dispatchers.IO) {
         bookSearchRepository.deleteBooks(book)
     }
-
     // viewModelScope, WhileSubscribed(5000), listOf() 책의 초기값
+    // stateflow로 변환해서 flow동작으로 favoriteFragment의 생명주기와 동기화
     val favoriteBooks: StateFlow<List<Book>> = bookSearchRepository.getFavoriteBooks()
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), listOf())
 
-    // SavedState
+    //SavedState
+    //쿼리 보존에 사용할 쿼리 변수
     var query = String()
         set(value) {
             field = value
-            //query값이 변경되면 값을 바로 반영
+            //field 를 사용해서 query값이 변경되면 값을 바로 반영
             savedStateHandle.set(SAVE_STATE_KEY, value)
         }
 
@@ -67,8 +70,9 @@ class BookSearchViewModel(
         private val WORKER_KEY = "cache_worker"
     }
 
-    // DataStore
+    //DataStore
     //값을 저장
+    //repository의 saveSortMode를 viewModelScope에서 실행하되 IO 작업이므로 Dispatchers를 IO로 설정
     fun saveSortMode(value: String) = viewModelScope.launch(Dispatchers.IO) {
         bookSearchRepository.saveSortMode(value)
     }
@@ -81,8 +85,9 @@ class BookSearchViewModel(
     }
 
     //Paging
+    //viewModel에서 paging된 데이터를 사용하기 위한 함수
     //Repository의 getFavoritePagingBooks 응답에 cachedIn을 붙여 코루틴이 데이터 스트림을 캐시하고 공유 가능하게 만들어줌
-    //그리고 UI에서 감시해야 하는 데이터이므로 stateIn사용
+    //그리고 UI에서 감시해야 하는 데이터이므로 stateIn사용하여 StateFlow로 만들어줌
     val favoritePagingBooks: StateFlow<PagingData<Book>> =
         bookSearchRepository.getFavoritePagingBooks()
             .cachedIn(viewModelScope)

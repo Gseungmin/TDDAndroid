@@ -8,6 +8,9 @@ import com.example.booksearchapp.util.Constants.PAGING_SIZE
 import retrofit2.HttpException
 import java.io.IOException
 
+/**
+ * retrofit 요청 결과를 load Result 객체로 반환하는 페이징 소스 정의
+ * */
 //결과값을 알아서 Paging소스로 반환해주던 Room과 달리 네트워크 응답은 우리가 직접 페이징 소스로 가공하는 과정이 추가
 //Paging은 페이지 및 사이즈 값을 필요에 따라 변화시켜 결과를 PagingSource로 반환한다
 //PagingSource는 크게 key를 만드는 부분과 페이징 소스를 만드는 부분으로 나누어짐
@@ -16,17 +19,19 @@ import java.io.IOException
 class BookSearchPagingSource(
     private val query: String,
     private val sort: String,
+    //PagingSource를 상속 받는데 안에는 페이지 타입과 데이터 타입이 들어감
 ) : PagingSource<Int, Book>() {
 
     //페이저가 데이터를 호출할때마다 호출되는 함수
     override suspend fun load(params: LoadParams<Int>): LoadResult<Int, Book> {
         return try {
-            //key를 받아와서 페이지 넘버 대입
+            //key를 받아와서 pageNumber에 대입
             val pageNumber = params.key ?: STARTING_PAGE_INDEX
 
-            //그 값을 retrofit에 전달해서 해당하는 데이터를 받아옴
+            //pageNumber 값을 retrofit에 전달해서 해당하는 데이터를 받아옴
             val response = api.searchBooks(query, sort, pageNumber, params.loadSize)
-            val endOfPaginationReached = response.body()?.meta?.isEnd!! //카카오 api에 특징 사용한 것
+            //값이 true이면 데이터의 끝이므로 next가 null
+            val endOfPaginationReached = response.body()?.meta?.isEnd!! //카카오 api 속성 사용한 것
 
             val data = response.body()?.documents!!
             //만약 현재 키가 1이면 이전키 null

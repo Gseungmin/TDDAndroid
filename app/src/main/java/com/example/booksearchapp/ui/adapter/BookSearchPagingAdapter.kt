@@ -8,11 +8,12 @@ import com.example.booksearchapp.data.model.Book
 import com.example.booksearchapp.databinding.ItemBookPreviewBinding
 
 //ListAdapter 대신 PagingDataAdapter 상속
+//Paging 데이터를 처리할 수 있는 RecyclerViewAdapter
 class BookSearchPagingAdapter : PagingDataAdapter<Book, BookSearchViewHolder>(BookDiffCallback) {
 
     override fun onBindViewHolder(holder: BookSearchViewHolder, position: Int) {
         val pagedBook = getItem(position)
-        //getItem null 처리
+        //getItem이 null일 수 있기 때문에 null 처리 따로 구현
         pagedBook?.let { book ->
             holder.bind(book)
             holder.itemView.setOnClickListener {

@@ -45,6 +45,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
 <!--다시 시작을 위한 retry버튼-->
     <Button
         android:id="@+id/btn_retry"

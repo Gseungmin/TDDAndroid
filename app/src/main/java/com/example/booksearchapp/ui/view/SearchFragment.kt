@@ -53,7 +53,8 @@ class SearchFragment : Fragment() {
 
         setupRecyclerView()
         searchBooks()
-
+        setupLoadState()
+        //viewModel 값의 변화 감지
 //        bookSearchViewModel.searchResult.observe(viewLifecycleOwner) { response ->
 //            val books = response.documents
 //            bookSearchAdapter.submitList(books)
@@ -86,6 +87,7 @@ class SearchFragment : Fragment() {
                 footer = BookSearchLoadStateAdapter(bookSearchAdapter::retry)
             )
         }
+        //클릭 리스너 설정
         bookSearchAdapter.setOnItemClickListener {
             val action = SearchFragmentDirections.actionFragmentSearchToBookFragment(it)
             findNavController().navigate(action)
@@ -102,6 +104,7 @@ class SearchFragment : Fragment() {
             Editable.Factory.getInstance().newEditable(bookSearchViewModel.query)
 
         //addTextChangedListener는 TextInputLayout에 EditText속성을 가지는데 값이 변할때마다 viewModel로 결과가 전달
+        //EditText의 값이 변할때마다 searchResult 값이 갱신되게 됨
         binding.etSearch.addTextChangedListener { text: Editable? ->
             endTime = System.currentTimeMillis()
             //처음 입력과 두번째 입력 사이의 차이가 100M초를 넘을때 실행
@@ -136,10 +139,12 @@ class SearchFragment : Fragment() {
             binding.rvSearchResult.isVisible = !isListEmpty
             //로딩중일때는 progressBar표시
             binding.progressBar.isVisible = loadState.refresh is LoadState.Loading
+
+            //PagingDataAdapter에 loadStateAdapter를 연결하면 데이터의 로딩 상태를 recyclerView 내부의 헤더나 푸터로 표현할 수 있음
         }
     }
 
-
+    //viewBinding이 더이상 필요 없을 경우 null 처리 필요
     override fun onDestroyView() {
         _binding = null
         super.onDestroyView()

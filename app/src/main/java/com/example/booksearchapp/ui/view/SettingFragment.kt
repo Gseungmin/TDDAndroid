@@ -52,7 +52,7 @@ class SettingFragment : Fragment() {
                 R.id.rb_accuracy -> Sort.ACCURACY.value
                 R.id.rb_latest -> Sort.LATEST.value
                 else -> return@setOnCheckedChangeListener
-            }
+            } //저장
             bookSearchViewModel.saveSortMode(value)
         }
 
@@ -101,6 +101,7 @@ class SettingFragment : Fragment() {
         }
     }
 
+    //viewBinding이 더이상 필요 없을 경우 null 처리 필요
     override fun onDestroy() {
         _binding = null
         super.onDestroy()

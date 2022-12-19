@@ -2,6 +2,7 @@ plugins {
     id 'com.android.application'
     id 'org.jetbrains.kotlin.android'
     id 'kotlin-kapt'
+    //safe args 사용
     id 'androidx.navigation.safeargs.kotlin'
     //Serializabl보다 속도면에서 우위
     id("kotlin-parcelize")
@@ -36,6 +37,7 @@ android {
     buildFeatures {
         viewBinding = true
     }
+    namespace 'com.example.booksearchapp'
 }
 
 dependencies {

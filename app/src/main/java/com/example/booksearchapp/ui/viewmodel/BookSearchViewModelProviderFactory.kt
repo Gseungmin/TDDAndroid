@@ -8,6 +8,9 @@ import androidx.savedstate.SavedStateRegistryOwner
 import androidx.work.WorkManager
 import com.example.booksearchapp.data.repository.BookSearchRepository
 
+/**
+ * ViewModel에 초기 값을 전달하기 위한 Factory
+ * */
 @Suppress("UNCHECKED_CAST")
 class BookSearchViewModelProviderFactory(
     private val bookSearchRepository: BookSearchRepository,

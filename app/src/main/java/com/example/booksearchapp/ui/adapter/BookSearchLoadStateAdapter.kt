@@ -6,6 +6,7 @@ import androidx.paging.LoadState
 import androidx.paging.LoadStateAdapter
 import com.example.booksearchapp.databinding.ItemLoadStateBinding
 
+//pagingDataAdapter에 리스너를 등록하면 데이터의 로딩 상태를 loadState 객체로 반환받을 수 있음
 class BookSearchLoadStateAdapter(
     private val retry: () -> Unit
 ) : LoadStateAdapter<BookSearchLoadStateViewHolder>() {

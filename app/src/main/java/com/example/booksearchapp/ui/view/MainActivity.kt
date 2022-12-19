@@ -3,6 +3,7 @@ package com.example.booksearchapp.ui.view
 import android.content.Context
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.datastore.preferences.preferencesDataStore
 import androidx.lifecycle.ViewModelProvider
@@ -45,14 +46,8 @@ class MainActivity : AppCompatActivity() {
 
         setupJetpackNavigation()
 
-        //앱이 처음 실행되었을 경우에만 화면에 SearchFragment 표현
-        //액티비티가 재생성 되었을 경우에는 굳이 첫번째 화면을 표시할 필요가 없기 때문
-        //savedInstanceState가 앱이 처음 실행되었는지 여부 판단
-//        if (savedInstanceState == null) {
-//            binding.navBottom.selectedItemId = R.id.fragment_search
-//        }
-
         val database = BookSearchDatabase.getInstance(this)
+        //datastore 의존성을 repository에 전달
         val bookSearchRepository = BookSearchRepositoryImpl(database, dataStore)
         val factory = BookSearchViewModelProviderFactory(bookSearchRepository, workManager, this)
         //viewModel 초기화
@@ -64,6 +59,7 @@ class MainActivity : AppCompatActivity() {
         val host = supportFragmentManager
             .findFragmentById(R.id.fragmentContainerView) as NavHostFragment? ?: return
         navController = host.navController
+
         //bottomNav와 NavController를 연결, 이러면 Navgation이 Fragment전환을 수행 해준다
         binding.navBottom.setupWithNavController(navController)
 

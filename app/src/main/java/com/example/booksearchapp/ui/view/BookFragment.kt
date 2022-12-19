@@ -59,7 +59,6 @@ class BookFragment : Fragment() {
 
     /**
      * onPause와 onResume에서 라이프사이클에 따른 WebView동작 정의
-     *
      * */
     override fun onPause() {
         binding.webView.onPause()

@@ -16,10 +16,11 @@ class BookSearchAdapter : ListAdapter<Book, BookSearchViewHolder>(BookDiffCallba
         )
     }
 
+    //데이터 바인딩
     override fun onBindViewHolder(holder: BookSearchViewHolder, position: Int) {
         val book = currentList[position]
         holder.bind(book)
-        //클릭 리스너 만들기
+        //각 viewHolder에 대해 클릭 리스너 만들기
         holder.itemView.setOnClickListener {
             onItemClickListener?.let { it(book) }
         }
@@ -30,6 +31,7 @@ class BookSearchAdapter : ListAdapter<Book, BookSearchViewHolder>(BookDiffCallba
         onItemClickListener = listener
     }
 
+    //DiffUtil 작동을 위한 Callback
     companion object {
         private val BookDiffCallback = object : DiffUtil.ItemCallback<Book>() {
             override fun areItemsTheSame(oldItem: Book, newItem: Book): Boolean {
