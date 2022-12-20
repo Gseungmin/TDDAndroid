@@ -1,37 +1,33 @@
 package com.example.booksearchapp.ui.view
 
 import android.os.Bundle
-import android.util.Log
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.lifecycleScope
-import androidx.lifecycle.repeatOnLifecycle
-import androidx.navigation.Navigation
+import androidx.fragment.app.Fragment
+import androidx.fragment.app.activityViewModels
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import com.example.booksearchapp.R
 import com.example.booksearchapp.databinding.FragmentFavoriteBinding
-import com.example.booksearchapp.ui.adapter.BookSearchAdapter
 import com.example.booksearchapp.ui.adapter.BookSearchPagingAdapter
 import com.example.booksearchapp.ui.viewmodel.BookSearchViewModel
 import com.example.booksearchapp.util.collectLatestStateFlow
 import com.google.android.material.snackbar.Snackbar
-import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.launch
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class FavoriteFragment : Fragment() {
 
-    private var _binding : FragmentFavoriteBinding? = null
+    private var _binding: FragmentFavoriteBinding? = null
     private val binding get() = _binding!!
 
-    private lateinit var bookSearchViewModel: BookSearchViewModel
-//    private lateinit var bookSearchAdapter: BookSearchAdapter
+    //    private lateinit var bookSearchViewModel: BookSearchViewModel
+    private val bookSearchViewModel by activityViewModels<BookSearchViewModel>()
+
+    //    private lateinit var bookSearchAdapter: BookSearchAdapter
     private lateinit var bookSearchAdapter: BookSearchPagingAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -51,7 +47,7 @@ class FavoriteFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        bookSearchViewModel = (activity as MainActivity).viewModel
+//        bookSearchViewModel = (activity as MainActivity).viewModel
 
         setupRecyclerView()
         setupTouchHelper(view)
@@ -122,7 +118,7 @@ class FavoriteFragment : Fragment() {
             adapter = bookSearchAdapter
         }
         //search한 아이템의 url 속성을 bookFragment에 전달
-        bookSearchAdapter.setOnItemClickListener  {
+        bookSearchAdapter.setOnItemClickListener {
             val action = FavoriteFragmentDirections.actionFragmentFavoriteToFragmentBook(it)
             findNavController().navigate(action)
         }
@@ -137,7 +133,7 @@ class FavoriteFragment : Fragment() {
             override fun onMove(
                 recyclerView: RecyclerView,
                 viewHolder: RecyclerView.ViewHolder,
-                target: RecyclerView.ViewHolder
+                target: RecyclerView.ViewHolder,
             ): Boolean {
                 return true
             }

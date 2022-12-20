@@ -5,7 +5,7 @@ import androidx.datastore.preferences.core.*
 import androidx.paging.Pager
 import androidx.paging.PagingConfig
 import androidx.paging.PagingData
-import com.example.booksearchapp.data.api.RetrofitInstance.api
+import com.example.booksearchapp.data.api.BookSearchApi
 import com.example.booksearchapp.data.db.BookSearchDatabase
 import com.example.booksearchapp.data.model.Book
 import com.example.booksearchapp.data.model.SearchResponse
@@ -17,16 +17,20 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.map
 import retrofit2.Response
 import java.io.IOException
+import javax.inject.Inject
+import javax.inject.Singleton
 
 /**
  * data의 출처와 관계 없이 동일한 인터페이스로 데이터에 접근할 수 있도록 하는 패턴
  * Repository를 사용함으로 ViewModel과 Data Layer(ROOM, Retrofit)와의 결합이 낮춰짐
  * */
-class BookSearchRepositoryImpl(
+@Singleton
+class BookSearchRepositoryImpl @Inject constructor(
     //생성자로 BookSearchDatabase를 받아서 Dao를 통해 각 메서드 구현
     //그 후 MainActivity에서 Repository 생성시 BookSearchDatabase 객체를 전달
     private val db: BookSearchDatabase,
-    private val dataStore: DataStore<Preferences>
+    private val dataStore: DataStore<Preferences>,
+    private val api: BookSearchApi,
 ) : BookSearchRepository {
 
     /**
@@ -47,9 +51,11 @@ class BookSearchRepositoryImpl(
     override suspend fun insertBooks(book: Book) {
         db.bookSearchDao().insertBook(book)
     }
+
     override suspend fun deleteBooks(book: Book) {
         db.bookSearchDao().deleteBook(book)
     }
+
     override fun getFavoriteBooks(): Flow<List<Book>> {
         return db.bookSearchDao().getBooks()
     }
@@ -116,7 +122,7 @@ class BookSearchRepositoryImpl(
     //그 후 다음 페이지 요청이 오면 key에 값을 지정해 페이지를 만드는 과정을 반복
     //과정은 room과 같음
     override fun searchBooksPaging(query: String, sort: String): Flow<PagingData<Book>> {
-        val pagingSourceFactory = { BookSearchPagingSource(query, sort) }
+        val pagingSourceFactory = { BookSearchPagingSource(api, query, sort) }
         return Pager(
             config = PagingConfig(
                 pageSize = PAGING_SIZE,

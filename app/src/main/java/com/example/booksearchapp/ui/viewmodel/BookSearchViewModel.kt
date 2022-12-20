@@ -8,19 +8,22 @@ import com.example.booksearchapp.data.model.Book
 import com.example.booksearchapp.data.model.SearchResponse
 import com.example.booksearchapp.data.repository.BookSearchRepository
 import com.example.booksearchapp.worker.CacheDeleteWorker
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import java.util.concurrent.TimeUnit
+import javax.inject.Inject
 
 /**
  * ViewModel 객체, Repository로 부터 데이터를 받아와서 처리, 따라서 Factory 필요
  * */
-class BookSearchViewModel(
+@HiltViewModel
+class BookSearchViewModel @Inject constructor(
     private val bookSearchRepository: BookSearchRepository,
     private val workManager: WorkManager,
-    private val savedStateHandle: SavedStateHandle
+    private val savedStateHandle: SavedStateHandle,
 ) : ViewModel() {
 
     private val _searchResult = MutableLiveData<SearchResponse>()
@@ -42,9 +45,11 @@ class BookSearchViewModel(
     fun saveBook(book: Book) = viewModelScope.launch(Dispatchers.IO) {
         bookSearchRepository.insertBooks(book)
     }
+
     fun deleteBook(book: Book) = viewModelScope.launch(Dispatchers.IO) {
         bookSearchRepository.deleteBooks(book)
     }
+
     // viewModelScope, WhileSubscribed(5000), listOf() 책의 초기값
     // stateflow로 변환해서 flow동작으로 favoriteFragment의 생명주기와 동기화
     val favoriteBooks: StateFlow<List<Book>> = bookSearchRepository.getFavoriteBooks()
@@ -76,7 +81,7 @@ class BookSearchViewModel(
     fun saveSortMode(value: String) = viewModelScope.launch(Dispatchers.IO) {
         bookSearchRepository.saveSortMode(value)
     }
-    
+
     //값을 불러옴
     suspend fun getSortMode() = withContext(Dispatchers.IO) {
         //설정 값 특성상 전체 데이터 스트림을 가져올 필요 없음
