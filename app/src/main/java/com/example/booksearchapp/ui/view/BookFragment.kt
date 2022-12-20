@@ -7,11 +7,11 @@ import android.view.View
 import android.view.ViewGroup
 import android.webkit.WebViewClient
 import androidx.fragment.app.Fragment
-import androidx.fragment.app.activityViewModels
+import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.navArgs
 import com.example.booksearchapp.databinding.FragmentBookBinding
-import com.example.booksearchapp.ui.viewmodel.BookSearchViewModel
 import com.google.android.material.snackbar.Snackbar
+import com.qualitybitz.booksearchapp.ui.viewmodel.BookViewModel
 import dagger.hilt.android.AndroidEntryPoint
 
 @AndroidEntryPoint
@@ -24,7 +24,7 @@ class BookFragment : Fragment() {
     private val args by navArgs<BookFragmentArgs>()
 
     //Floating Action정의
-    private val bookSearchViewModel by activityViewModels<BookSearchViewModel>()
+    private val bookSearchViewModel by viewModels<BookViewModel>()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
