@@ -10,6 +10,7 @@ import org.junit.Test
 class CalculatorTest {
     private lateinit var calculator: Calculator
 
+    /**테스트마다 calculator 인스턴스를 새로 작업*/
     @Before
     fun setUp() {
         calculator = Calculator()
