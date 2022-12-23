@@ -22,15 +22,15 @@ class BookViewModelTest {
         viewModel = BookViewModel(FakeBookSearchRepository())
     }
 
-    @Test
-    fun save_book_test() = runTest {
-        val book = Book(
-            listOf("a"), "b", "c", "d", 0, "e",
-            0, "f", "g", "h", listOf("i"), "j"
-        )
-        viewModel.saveBook(book)
-
-        val favoriteBooks = viewModel.favoriteBooks.first()
-        Truth.assertThat(favoriteBooks).contains(book)
-    }
+//    @Test
+//    fun save_book_test() = runTest {
+//        val book = Book(
+//            listOf("a"), "b", "c", "d", 0, "e",
+//            0, "f", "g", "h", listOf("i"), "j"
+//        )
+//        viewModel.saveBook(book)
+//
+//        val favoriteBooks = viewModel.favoriteBooks.first()
+//        Truth.assertThat(favoriteBooks).contains(book)
+//    }
 }

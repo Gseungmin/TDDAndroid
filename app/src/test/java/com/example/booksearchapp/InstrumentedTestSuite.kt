@@ -12,7 +12,7 @@ import org.junit.runners.Suite
 @Suite.SuiteClasses(
     MainActivityTest::class,
     CalculatorTest::class,
-    BookViewModelTest::class
+//    BookViewModelTest::class
 )
 class InstrumentedTestSuite {
 }
