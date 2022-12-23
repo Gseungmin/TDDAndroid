@@ -11,8 +11,7 @@ import org.junit.runners.Suite
 @ExperimentalCoroutinesApi
 @Suite.SuiteClasses(
     MainActivityTest::class,
-    CalculatorTest::class,
-    BookViewModelTest::class
+    CalculatorTest::class
 )
 class InstrumentedTestSuite {
 }
