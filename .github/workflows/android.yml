@@ -11,6 +11,11 @@ jobs:
 
     runs-on: ubuntu-latest
 
+    strategy:
+      matrix:
+        api-level: [30, 29, 23]
+        target: [default, google_apis]
+
     steps:
     - uses: actions/checkout@v3
     - name: set up JDK 11
@@ -26,7 +31,20 @@ jobs:
       run: ./gradlew build
       
     - name: Unit tests
-      run: ./gradlew testDebugUnitTest  
+      run: ./gradlew testDebugUnitTest
+    
+    - name: Run detekt
+      run: ./gradlew detektCheck
+      
+    - name: Instrumentation Tests
+      uses: reactivecircus/android-emulator-runner@v2
+      with:
+        api-level: ${{ matrix.api-level }}
+        target: ${{ matrix.target }}
+        arch: x86
+        profile: Nexus 6
+        script: ./gradlew connectedCheck --stacktrace
+      
     - name: Android Test Report
       uses: asadmansr/android-test-report-action@v1.2.0
       if: ${{ always() }}
