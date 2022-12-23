@@ -43,6 +43,9 @@ android {
     kapt {
         correctErrorTypes true
     }
+    testOptions {
+        unitTests.includeAndroidResources = true
+    }
     namespace 'com.example.booksearchapp'
 }
 
@@ -125,6 +128,7 @@ dependencies {
     //for unit test
     testImplementation "androidx.test.ext:truth:1.5.0"
     testImplementation 'androidx.test:runner:1.5.0'
+    testImplementation "org.robolectric:robolectric:4.9.1"
 
     //for instrument test
     androidTestImplementation "androidx.test.ext:truth:1.5.0"
