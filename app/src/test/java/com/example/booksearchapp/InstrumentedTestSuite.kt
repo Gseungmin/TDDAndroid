@@ -1,6 +1,7 @@
 package com.example.booksearchapp
 
 import com.example.booksearchapp.ui.view.MainActivityTest
+import com.example.booksearchapp.ui.viewmodel.BookViewModelTest
 import com.example.booksearchapp.util.CalculatorTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.junit.runner.RunWith
@@ -11,6 +12,7 @@ import org.junit.runners.Suite
 @Suite.SuiteClasses(
     MainActivityTest::class,
     CalculatorTest::class,
+    BookViewModelTest::class
 )
 class InstrumentedTestSuite {
 }
