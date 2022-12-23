@@ -127,5 +127,8 @@ dependencies {
     testImplementation 'androidx.test:runner:1.5.0'
 
     //for instrument test
+    androidTestImplementation "androidx.test.ext:truth:1.5.0"
+    androidTestImplementation 'androidx.test:runner:1.5.0'
+    androidTestImplementation 'androidx.test:core:1.5.0'
 
 }
