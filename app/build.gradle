@@ -122,15 +122,18 @@ dependencies {
 
     //test dependency
     testImplementation 'junit:junit:4.13.2' //JUNIT
-    androidTestImplementation 'androidx.test.ext:junit:1.1.3' //ANDROID_JUNIT
-    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0' //ESPRESSO_CORE
 
     //for unit test
+    testImplementation 'junit:junit:4.13.2' //JUNIT
+    testImplementation 'androidx.test.ext:junit:1.1.3' //ANDROID_JUNIT
     testImplementation "androidx.test.ext:truth:1.5.0"
     testImplementation 'androidx.test:runner:1.5.0'
+    testImplementation 'androidx.test:core:1.5.0'
     testImplementation "org.robolectric:robolectric:4.9.1"
 
     //for instrument test
+    androidTestImplementation 'androidx.test.ext:junit:1.1.3' //ANDROID_JUNIT
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.4.0' //ESPRESSO_CORE
     androidTestImplementation "androidx.test.ext:truth:1.5.0"
     androidTestImplementation 'androidx.test:runner:1.5.0'
     androidTestImplementation 'androidx.test:core:1.5.0'
