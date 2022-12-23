@@ -28,15 +28,6 @@ jobs:
     - name: Unit tests
       run: ./gradlew testDebugUnitTest
       
-    - name: Instrumentation Tests
-      uses: reactivecircus/android-emulator-runner@v2
-      with:
-        api-level: 30
-        target: google_apis
-        arch: x86
-        profile: Nexus 6
-        script: ./gradlew connectedCheck --stacktrace
-      
     - name: Android Test Report
       uses: asadmansr/android-test-report-action@v1.2.0
       if: ${{ always() }}
