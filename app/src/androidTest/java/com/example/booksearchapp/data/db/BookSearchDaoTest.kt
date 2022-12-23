@@ -6,34 +6,47 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.filters.SmallTest
 import com.example.booksearchapp.data.model.Book
 import com.google.common.truth.Truth.assertThat
+import dagger.hilt.android.testing.HiltAndroidRule
+import dagger.hilt.android.testing.HiltAndroidTest
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.After
 import org.junit.Before
+import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
+import javax.inject.Inject
+import javax.inject.Named
 
-@RunWith(AndroidJUnit4::class)
+//@RunWith(AndroidJUnit4::class)
+@HiltAndroidTest
 @SmallTest
 @ExperimentalCoroutinesApi
 class BookSearchDaoTest {
 
-    private lateinit var database: BookSearchDatabase
+//    private lateinit var database: BookSearchDatabase
+    @Inject
+    @Named("test_db")
+    lateinit var database: BookSearchDatabase
     private lateinit var dao: BookSearchDao
 
-    /**
-     * db는 inMemoryDatabaseBuilder를 통해 메모리 안에서만 사용 후 테스트가 끝나면 파괴
-     * Room은 ANR(Appliaction Not Responding)을 방지하기 위해 MainThread에서의 쿼리를 금지하는데
-     * DB에 대한 쿼리를 멀티 쓰레드에서 사용하면 테스트 결과를 예측할 수 없으므로 allowMainThreadQueries를 통해
-     * MainThread 쿼리 수행 가능하도록 설정
-     * */
+    @get:Rule
+    var hiltRule = HiltAndroidRule(this)
+
+//    /**
+//     * db는 inMemoryDatabaseBuilder를 통해 메모리 안에서만 사용 후 테스트가 끝나면 파괴
+//     * Room은 ANR(Appliaction Not Responding)을 방지하기 위해 MainThread에서의 쿼리를 금지하는데
+//     * DB에 대한 쿼리를 멀티 쓰레드에서 사용하면 테스트 결과를 예측할 수 없으므로 allowMainThreadQueries를 통해
+//     * MainThread 쿼리 수행 가능하도록 설정
+//     * */
     @Before
     fun setUp() {
-        database = Room.inMemoryDatabaseBuilder(
-            ApplicationProvider.getApplicationContext(),
-            BookSearchDatabase::class.java
-        ).allowMainThreadQueries().build()
+//        database = Room.inMemoryDatabaseBuilder(
+//            ApplicationProvider.getApplicationContext(),
+//            BookSearchDatabase::class.java
+//        ).allowMainThreadQueries().build()
+        hiltRule.inject()
         dao = database.bookSearchDao()
     }
 
