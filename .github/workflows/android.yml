@@ -13,7 +13,14 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-    
+
+    - name: Copy secret
+      env:
+        OCCUPY_SECRET: ${{ secrets.API_KEY }}
+        OCCUPY_SECRET_DIR: src/main/resources/java/com/example/booksearchapp/util
+        OCCUPY_SECRET_DIR_FILE_NAME: Constants.yml
+      run: echo $OCCUPY_SECRET | base64 --decode > $OCCUPY_SECRET_DIR/$OCCUPY_SECRET_DIR_FILE_NAME
+  
     - name: set SecretKey
       run: |
         sed -i "1s#=#&$APP_KEY#" .env
