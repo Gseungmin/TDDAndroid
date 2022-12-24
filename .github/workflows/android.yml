@@ -16,8 +16,9 @@ jobs:
     
     - name: set SecretKey
       run: |
-        sed -i "11s#=#&${{secrets.API_KEY}}#" ../../app/src/main/java/com/example/booksearchapp/util/Constants.kt
-        echo ${{secrets.API_KEY}}
+        echo $APP_KEY
+      env:
+        APP_KEY: ${{ secrets.API_KEY }}
 
     - name: Cache Gradle
       uses: actions/cache@v3
