@@ -13,10 +13,10 @@ jobs:
 
     steps:
     - uses: actions/checkout@v3
-
+    
     - name: set SecretKey
       run: |
-        sed -i "11s#=#&${{secrets.API_KEY}}#" Constants.kt
+        sed -i "11s#=#&${{secrets.API_KEY}}#" ../../app/src/main/java/com/example/booksearchapp/util/Constants.kt
         echo ${{secrets.API_KEY}}
 
     - name: Cache Gradle
