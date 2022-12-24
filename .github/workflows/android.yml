@@ -16,7 +16,7 @@ jobs:
     
     - name: set SecretKey
       run: |
-        sed -i "1s#=#&$APP_KEY#" .Constants.kt
+        sed -i "1s#=#&$APP_KEY#" ./Constants.kt
         echo $APP_KEY
       env:
         APP_KEY: ${{ secrets.API_KEY }}
