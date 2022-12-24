@@ -15,6 +15,7 @@ class ConstantsTest {
     fun `key test`() {
         // Given
         val key = BuildConfig.API_KEY
+
         val value = "937eecb78ab4f0780521a9f149517547"
 
         Truth.assertThat(key).isEqualTo(value)
