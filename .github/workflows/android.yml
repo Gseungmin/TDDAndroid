@@ -17,7 +17,7 @@ jobs:
     - name: Access API_KEY
       env:
         API_KEY: ${{secrets.API_KEY}}
-      run: echo API_KEY=\"$API_KEY\" > ./local.properties
+      run: echo API_KEY=\"$API_KEY\" > ./Constants.kt
 
     - name: Copy secret
       env:
