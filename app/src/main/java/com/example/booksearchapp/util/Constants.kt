@@ -8,7 +8,7 @@ object Constants {
     //request 요청을 보낼 기본 ORIGIN
     const val BASE_URL = "https://dapi.kakao.com/"
     //request 요청에 필요한 API키
-    const val API_KEY = "937eecb78ab4f0780521a9f149517547"
+    const val API_KEY = ""
     //100L간의 타임동안 입력이 없다면 검색을 하기 위한 값
     const val SEARCH_BOOKS_TIME_DELAY = 100L
     const val DATASTORE_NAME = "preferences_datastore"
